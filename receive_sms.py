@@ -36,19 +36,30 @@ def sms_reply():
         resp.message(wiki_stuff)
         return str(resp)
 
-
-
-def help():
-    helpcheck = body[6:]
-
-
     elif check == 0:
+        help()
 
     else:
         needshelp = needshelp + 1
         if needshelp >= 10:
 
         resp.message("Invalid.")
+        return str(resp)
+
+#User Help Command
+def help():
+    helpcheck = body[6:]
+    if helpcheck == "echo"
+        echo = ""
+        resp.message(echo)
+        return str(resp)
+    elif helpcheck == "wiki"
+        wiki = ""
+        resp.message(wiki)
+        return str(resp)
+    elif helpcheck == "help"
+        dumb = ""
+        resp.message(dumb)
         return str(resp)
 
 #Checks for the command
