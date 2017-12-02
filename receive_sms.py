@@ -29,9 +29,9 @@ def sms_reply():
     elif check == 2:
         body = body[6:]
         name = wikipedia.suggest(body)
-        title = wikipedia.title(name)
+        title = wikipedia.page(name).title
         summary = wikipedia.summary(name, sentences=3)
-        url = wikipedia.url
+        url = wikipedia.page(name).title
         wiki_stuff = title + "\n" + summary + "\n" + "Find out more at " + url
         resp.message(wiki_stuff)
         return str(resp)
@@ -52,18 +52,19 @@ def sms_reply():
             resp.message(dumb)
             return str(resp)
         elif helpcheck == "all":
-            allcommands = commandlist + "\n" + echo + "\n" + wiki + "\n" + dumb
+            allcommands = "Commands: all, echo, wiki, help" + "\n\n" + echo + "\n\n" + wiki + "\n\n" + dumb
             resp.message(allcommands)
+            return str(resp)
         elif helpcheck == "":
             resp.message(commandlist)
             return str(resp)
 
-    else:
-        needshelp = needshelp + 1
+#    else:
+    #    needshelp = needshelp + 1
     #    if needshelp >= 10:
+    #        needshelp = 0
 
-        resp.message("Invalid.")
-        return str(resp)
+    #    return
 
 
 
@@ -76,8 +77,9 @@ def command_check():
         return 1
     elif check == '!wiki ':
         return 2
-    else:
+    elif check == '!help':
         return 0
+
 
 
 if __name__ == "__main__":
