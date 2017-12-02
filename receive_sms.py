@@ -18,7 +18,7 @@ def sms_reply():
     check = command_check()
     resp = MessagingResponse()
     needshelp = 0
-    
+
     # !echo
     if check == 1:
         body = body[6:]
@@ -37,30 +37,35 @@ def sms_reply():
         return str(resp)
 
     elif check == 0:
-        help()
+        helpcheck = body[6:]
+        echo = "!echo [YourTextHere] repeats whatever you input"
+        wiki = "!wiki [SearchWordHere] displays information about the searched word"
+        dumb = "!help [CommandHere] explains each command"
+        commandlist = ["echo", "wiki", "help", "all"]
+        if helpcheck == "echo":
+            resp.message(echo)
+            return str(resp)
+        elif helpcheck == "wiki":
+            resp.message(wiki)
+            return str(resp)
+        elif helpcheck == "help":
+            resp.message(dumb)
+            return str(resp)
+        elif helpcheck == "all":
+            allcommands = commandlist + "\n" + echo + "\n" + wiki + "\n" + dumb
+            resp.message(allcommands)
+        elif helpcheck == "":
+            resp.message(commandlist)
+            return str(resp)
 
     else:
         needshelp = needshelp + 1
-        if needshelp >= 10:
+    #    if needshelp >= 10:
 
         resp.message("Invalid.")
         return str(resp)
 
-#User Help Command
-def help():
-    helpcheck = body[6:]
-    if helpcheck == "echo"
-        echo = ""
-        resp.message(echo)
-        return str(resp)
-    elif helpcheck == "wiki"
-        wiki = ""
-        resp.message(wiki)
-        return str(resp)
-    elif helpcheck == "help"
-        dumb = ""
-        resp.message(dumb)
-        return str(resp)
+
 
 #Checks for the command
 def command_check():
