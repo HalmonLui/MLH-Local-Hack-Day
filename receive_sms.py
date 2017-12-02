@@ -28,10 +28,10 @@ def sms_reply():
     # !wiki
     elif check == 2:
         body = body[6:]
-        name = wikipedia.suggest(body)
-        title = wikipedia.title(name)
-        summary = wikipedia.summary(name, sentences=3)
-        url = wikipedia.url
+        article = wikipedia.page(title=body, auto-suggest=True)
+        title = article.title
+        summary = wikipedia.summary(title, sentences=3)
+        url = article.url
         wiki_stuff = title + "\n" + summary + "\n" + "Find out more at " + url
         resp.message(wiki_stuff)
         return str(resp)
