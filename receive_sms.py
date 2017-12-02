@@ -29,7 +29,13 @@ def sms_reply():
     # !wiki
     elif check == 2:
         body = body[6:]
-        search = wikipedia.search(body, results=1, suggestion=True)
+        
+        # Search for article
+        try:
+           search = wikipedia.search(body, results=1, suggestion=True) 
+        except wikipedia.exceptions.PageError as e:
+            resp.message("Error generating Wikipedia page.")
+            return str(resp)
 
         # Removes disambiguation error
         try:
@@ -37,9 +43,12 @@ def sms_reply():
         except wikipedia.exceptions.DisambiguationError as e:
             article = wikipedia.page(title=e.options[0])
 
+        # Returns article info
         title = article.title
         summary = wikipedia.summary(title, sentences=3)
         url = article.url
+        
+        # Submits article info
         wiki_stuff = title + "\n\n" + summary + "\n\n" + "Find out more at:" + url
         resp.message(wiki_stuff)
         return str(resp)
