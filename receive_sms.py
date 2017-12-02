@@ -17,7 +17,7 @@ def sms_reply():
     # Gets the SMS sent to the number
     body = request.values.get('Body', None)
     check = command_check()
-    resp = MessagingResponse()
+    resp = MessagingResponse()Dis
     needshelp = 0
 
     # !echo
@@ -29,8 +29,14 @@ def sms_reply():
     # !wiki
     elif check == 2:
         body = body[6:]
-        search = wikipedia.search(body, results = 1, suggestion=True)
-        article = wikipedia.page(title=search[0], auto_suggest=True, redirect=True)
+        search = wikipedia.search(body, results=1, suggestion=True)
+
+        # Removes disambiguation error
+        try:
+            article = wikipedia.page(title=search[0])
+        except wikipedia.exceptions.DisambiguationError as e:
+            article = wikipedia.page(title=e.options[0])
+
         title = article.title
         summary = wikipedia.summary(title, sentences=3)
         url = article.url
