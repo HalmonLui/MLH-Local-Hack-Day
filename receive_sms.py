@@ -16,11 +16,15 @@ def sms_reply():
         resp.message(body)
         return str(resp)
 
+def help():
+
 def command_check():
     body = request.values.get('Body', None)
     body = body.lower()
     check = body[:5]
     if check == '!echo':
+        return True
+    elif check == '!help':
         return True
     else:
         return False
