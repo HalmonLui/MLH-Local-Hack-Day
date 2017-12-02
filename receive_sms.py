@@ -18,6 +18,8 @@ def sms_reply():
     check = command_check()
     resp = MessagingResponse()
     needshelp = 0
+    
+    # !echo
     if check == 1:
         body = body[6:]
         resp.message(body)
@@ -25,9 +27,13 @@ def sms_reply():
 
     # !wiki
     elif check == 2:
-        param = body[6:].replace(" ", "_")
-        wiki_link = "https://en.wikipedia.org/wiki/" + param
-        resp.message(wiki_link)
+        body = body[6:]
+        data = wikipedia.page(body)
+        title = data.title
+        content = data.content
+        url = data.url
+        wiki_stuff = title + "\n" + content + "\n" + "Find out more at " + url
+        resp.message(wiki_stuff)
         return str(resp)
 
 
