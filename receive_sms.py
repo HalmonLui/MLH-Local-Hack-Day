@@ -11,9 +11,17 @@ def sms_reply():
     body = request.values.get('Body', None)
     check = command_check()
     resp = MessagingResponse()
-    if check == True:
-        body = body[5:]
+    if check == 1:
+        body = body[6:]
         resp.message(body)
+        return str(resp)
+    elif check == 2:
+        param = body[6:].replace(" ", "_")
+        wiki_link = "https://en.wikipedia.org/" + param
+        resp.message(wiki_link)
+        return str(resp)
+    else:
+        resp.message("Invalid.")
         return str(resp)
 
 def help():
@@ -21,13 +29,13 @@ def help():
 def command_check():
     body = request.values.get('Body', None)
     body = body.lower()
-    check = body[:5]
-    if check == '!echo':
-        return True
-    elif check == '!help':
-        return True
+    check = body[:6]
+    if check == '!echo ':
+        return 1
+    elif check == '!wiki ':
+        return 2
     else:
-        return False
+        return 0
 
 
 if __name__ == "__main__":
