@@ -1,6 +1,7 @@
 # Imports stuff
 import os
 import wikipedia
+import yahoo_finance
 from flask import Flask, request, redirect
 from twilio.twiml.messaging_response import MessagingResponse
 
@@ -28,7 +29,8 @@ def sms_reply():
     # !wiki
     elif check == 2:
         body = body[6:]
-        article = wikipedia.page(title=body, auto-suggest=True)
+        search = wikipedia.search(body, results = 1, suggestion=True)
+        article = wikipedia.page(title=search[0], auto_suggest=True, redirect=True)
         title = article.title
         summary = wikipedia.summary(title, sentences=3)
         url = article.url
@@ -36,37 +38,53 @@ def sms_reply():
         resp.message(wiki_stuff)
         return str(resp)
 
+    # !stock
+    elif check == 3:
+        body = body[7:]
+        body = body.upper()
+        stock = Share(body)
+        stock.refresh()
+        stockname = stock.get_name()
+        openprice = stock.get_open()
+        currentprice = stock.get_price()
+        stockinfo = "Name: " + stockname + "\n" + "Open Price: " + openprice + "\n" + "Current Price: " + currentprice + "\n"
+        resp.message(stockinfo)
+        return str(resp)
+    # !help
     elif check == 0:
-        helpcheck = body[6:]
-        echo = "!echo [YourTextHere] repeats whatever you input"
-        wiki = "!wiki [SearchWordHere] displays information about the searched word"
-        dumb = "!help [CommandHere] explains each command"
-        commandlist = ["echo", "wiki", "help", "all"]
-        if helpcheck == "echo":
-            resp.message(echo)
-            return str(resp)
-        elif helpcheck == "wiki":
-            resp.message(wiki)
-            return str(resp)
-        elif helpcheck == "help":
-            resp.message(dumb)
-            return str(resp)
-        elif helpcheck == "all":
-            allcommands = "Commands: all, echo, wiki, help" + "\n\n" + echo + "\n\n" + wiki + "\n\n" + dumb
-            resp.message(allcommands)
-            return str(resp)
-        elif helpcheck == "":
-            resp.message(commandlist)
-            return str(resp)
+        help()
 
-#    else:
-    #    needshelp = needshelp + 1
-    #    if needshelp >= 10:
-    #        needshelp = 0
+    # 5 Failed Commands = !help
+    else:
+        needshelp = needshelp + 1
+        if needshelp >= 5:
+            needshelp = 0
+            help()
+        return
 
-    #    return
-
-
+#Command Help
+def help():
+    echo = "!echo [YourTextHere] repeats whatever you input"
+    wiki = "!wiki [SearchWordHere] displays information about the searched word"
+    dumb = "!help [CommandHere] explains each command"
+    commandlist = ["echo", "wiki", "help", "all"]
+    helpcheck = body[6:]
+    if helpcheck == "echo":
+        resp.message(echo)
+        return str(resp)
+    elif helpcheck == "wiki":
+        resp.message(wiki)
+        return str(resp)
+    elif helpcheck == "help":
+        resp.message(dumb)
+        return str(resp)
+    elif helpcheck == "all":
+        allcommands = "Commands: all, echo, wiki, help" + "\n\n" + echo + "\n\n" + wiki + "\n\n" + dumb
+        resp.message(allcommands)
+        return str(resp)
+    elif helpcheck == "":
+        resp.message(commandlist)
+        return str(resp)
 
 #Checks for the command
 def command_check():
@@ -77,6 +95,8 @@ def command_check():
         return 1
     elif check == '!wiki ':
         return 2
+    elif check == '!stock ':
+        return 3
     elif check == '!help':
         return 0
 
