@@ -28,7 +28,8 @@ def sms_reply():
     # !wiki
     elif check == 2:
         body = body[6:]
-        data = wikipedia.page(body)
+        name = wikipedia.suggest(body)
+        data = wikipedia.page(name)
         title = data.title
         content = data.content
         url = data.url
