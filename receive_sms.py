@@ -17,7 +17,7 @@ def sms_reply():
     # Gets the SMS sent to the number
     body = request.values.get('Body', None)
     check = command_check()
-    resp = MessagingResponse()Dis
+    resp = MessagingResponse()
     needshelp = 0
 
     # !echo
@@ -40,7 +40,7 @@ def sms_reply():
         title = article.title
         summary = wikipedia.summary(title, sentences=3)
         url = article.url
-        wiki_stuff = title + "\n" + summary + "\n" + "Find out more at " + url
+        wiki_stuff = title + "\n\n" + summary + "\n\n" + "Find out more at:" + url
         resp.message(wiki_stuff)
         return str(resp)
 
@@ -58,7 +58,7 @@ def sms_reply():
         return str(resp)
     # !help
     elif check == 0:
-        help()
+        return help()
 
     # 5 Failed Commands = !help
     else:
@@ -74,6 +74,9 @@ def help():
     wiki = "!wiki [SearchWordHere] displays information about the searched word"
     dumb = "!help [CommandHere] explains each command"
     commandlist = ["echo", "wiki", "help", "all"]
+    resp = MessagingResponse()
+    body = request.values.get('Body', None)
+    body = body.lower()
     helpcheck = body[6:]
     if helpcheck == "echo":
         resp.message(echo)
@@ -103,7 +106,7 @@ def command_check():
         return 2
     elif check == '!stock ':
         return 3
-    elif check == '!help':
+    elif check == '!help ':
         return 0
 
 
