@@ -4,11 +4,18 @@ import wikipedia
 import yahoo_finance
 import json
 import requests
+import random
 from yahoo_finance import Share
 from helpers import *
 from googlefinance import getQuotes
 from flask import Flask, request, redirect
+from flask import Flask, request, redirect, send_file
 from twilio.twiml.messaging_response import MessagingResponse
+
+# Imgur
+from imgurpython import ImgurClient
+client_id = 'c6304c244358656'
+client_secret = 'd810dd4b469ee625098f45efcea34b14c05dfbdb'
 
 # Initiates Flask
 app = Flask(__name__)
@@ -28,13 +35,31 @@ def sms_reply():
     # !echo
     if check == 1:
         body = body[6:]
-        resp.message(body)
+
+        # Checks for parameters
+        if body == None:
+            resp.message("!echo requires additional input.")
+        else:
+            resp.message(body)
+
+        # Echoes
         return str(resp)
 
     # !wiki
     elif check == 2:
         body = body[6:]
-        search = wikipedia.search(body, results=1, suggestion=True)
+
+        # Checks for parameters
+        if body == None:
+            resp.message("!wiki requires additonal input.")
+            return str(resp)
+
+        # Search for article
+        try:
+           search = wikipedia.search(body, results=1, suggestion=True)
+        except wikipedia.exceptions.PageError as e:
+            resp.message("Error generating Wikipedia page.")
+            return str(resp)
 
         # Removes disambiguation error
         try:
@@ -42,9 +67,12 @@ def sms_reply():
         except wikipedia.exceptions.DisambiguationError as e:
             article = wikipedia.page(title=e.options[0])
 
+        # Returns article info
         title = article.title
         summary = wikipedia.summary(title, sentences=3)
         url = article.url
+
+        # Submits article info
         wiki_stuff = title + "\n\n" + summary + "\n\n" + "Find out more at:" + url
         resp.message(wiki_stuff)
         return str(resp)
@@ -52,6 +80,11 @@ def sms_reply():
     # !stock
     elif check == 3:
         body = body[7:]
+
+        # Checks for parameters
+        if body == None:
+            resp.message("!stock requires additonal input.")
+
         body = body.upper()
         stocklink = "https://finance.google.com/finance?q=" + body + "&output=json"
         rsp = requests.get(stocklink)
@@ -65,9 +98,27 @@ def sms_reply():
             stockinfo = "Invalid stock symbol \n\nSymbols: Facebook(FB), Apple(AAPL), Alphabet(GOOG), Yahoo(YHOO), Amazon(AMZN), Coca-Cola(KO), Walmart(WMT), Microsoft(MSFT)\n\nMore at: https://finance.yahoo.com/"
         resp.message(stockinfo)
         return str(resp)
+
     # !help
     elif check == 0:
         return help()
+
+    # !rand
+    elif check == 4:
+        body = body[6:]
+
+        # If no parameter is applied
+        if body == None:
+            items = ImgurClient.gallery()
+            randnum = random(0, len(items)-1)
+            img = get_image(items[randnum].image_id)
+            return img
+        else:
+            items = ImgurClient.gallery_search(body)
+            randnum = random(0, len(items)-1)
+            img = get_image(items[randnum].image_id)
+            return img
+
 
     # 5 Failed Commands = !help
     else:
@@ -123,6 +174,8 @@ def command_check():
             return 3
     elif check == '!help ':
         return 0
+    elif check == '!rand ':
+        return 4
 
 
 
