@@ -2,8 +2,14 @@
 import os
 import wikipedia
 import yahoo_finance
-from flask import Flask, request, redirect
+import random
+from flask import Flask, request, redirect, send_file
 from twilio.twiml.messaging_response import MessagingResponse
+
+# Imgur
+from imgurpython import ImgurClient
+client_id = 'c6304c244358656'
+client_secret = 'd810dd4b469ee625098f45efcea34b14c05dfbdb'
 
 # Initiates Flask
 app = Flask(__name__)
@@ -23,12 +29,24 @@ def sms_reply():
     # !echo
     if check == 1:
         body = body[6:]
-        resp.message(body)
+        
+        # Checks for parameters
+        if body == None:
+            resp.message("!echo requires additional input.")
+        else:
+            resp.message(body) 
+        
+        # Echoes
         return str(resp)
 
     # !wiki
     elif check == 2:
         body = body[6:]
+        
+        # Checks for parameters
+        if body == None:
+            resp.message("!wiki requires additonal input.")
+            return str(resp)
         
         # Search for article
         try:
@@ -56,6 +74,11 @@ def sms_reply():
     # !stock
     elif check == 3:
         body = body[7:]
+        
+        # Checks for parameters
+        if body == None:
+            resp.message("!stock requires additonal input.")
+            
         body = body.upper()
         stock = Share(body)
         stock.refresh()
@@ -65,10 +88,28 @@ def sms_reply():
         stockinfo = "Name: " + stockname + "\n" + "Open Price: " + openprice + "\n" + "Current Price: " + currentprice + "\n"
         resp.message(stockinfo)
         return str(resp)
+    
     # !help
     elif check == 0:
         return help()
-
+    
+    # !rand
+    elif check == 4:
+        body = body[6:]
+        
+        # If no parameter is applied
+        if body == None:
+            items = ImgurClient.gallery()
+            randnum = random(0, len(items)-1)
+            img = get_image(items[randnum].image_id)
+            return img
+        else:
+            items = ImgurClient.gallery_search(body)
+            randnum = random(0, len(items)-1)
+            img = get_image(items[randnum].image_id)
+            return img
+            
+    
     # 5 Failed Commands = !help
     else:
         needshelp = needshelp + 1
@@ -117,6 +158,8 @@ def command_check():
         return 3
     elif check == '!help ':
         return 0
+    elif check == '!rand ':
+        return 4
 
 
 
