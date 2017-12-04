@@ -114,7 +114,7 @@ def sms_reply():
             img = get_image(items[randnum].image_id)
             return img
         else:
-            items = ImgurClient.gallery_search(body)
+            items = ImgurClient.gallery_search(q=body, advanced=None, sort='time', window='all', page=0)
             randnum = random(0, len(items)-1)
             img = get_image(items[randnum].image_id)
             return img
@@ -152,7 +152,7 @@ def help():
         resp.message(stock)
         return str(resp)
     elif helpcheck == "all":
-        allcommands = "Commands: all, echo, wiki, help, stock" + "\n\n" + echo + "\n\n" + wiki + "\n\n" + dumb
+        allcommands = "Commands: all, echo, wiki, help, stock" + "\n\n" + echo + "\n\n" + wiki + "\n\n" + stock + "\n\n" + dumb
         resp.message(allcommands)
         return str(resp)
     elif helpcheck == "":
